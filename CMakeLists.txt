@@ -3,4 +3,4 @@ project(arp_scanner)
 
 set(CMAKE_CXX_STANDARD 11)
 add_definitions(-g -ggdb)
-add_executable(arp_scanner main.c)
+add_executable(arp_scanner src/main.c)

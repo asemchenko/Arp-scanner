@@ -3,4 +3,6 @@ project(arp_scanner)
 
 set(CMAKE_CXX_STANDARD 11)
 add_definitions(-g -ggdb)
-add_executable(arp_scanner src/main.c)
+set(SOURCE_DIR src/)
+add_executable(arp_scanner ${SOURCE_DIR}main.c ${SOURCE_DIR}arpUtils.c)
+target_link_libraries(arp_scanner m)

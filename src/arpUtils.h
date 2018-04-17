@@ -39,4 +39,6 @@ void setHostPart(uint8_t ip[PROTOCOL_ADDRESS_LENGTH],
 void setDstIP(uint8_t ip[PROTOCOL_ADDRESS_LENGTH],
               struct ArpPacket *p);
 
+void printIP(uint8_t ip[PROTOCOL_ADDRESS_LENGTH], FILE *stream);
+
 #endif //ARP_SCANNER_ARPUTILS_H

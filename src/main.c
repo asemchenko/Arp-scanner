@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <linux/if_ether.h>
 #include <math.h>
+#include <unistd.h>
 
 #include "arpUtils.h"
 #include "ArpPacket.h"
@@ -37,12 +38,6 @@ int readNetworkAddr(const char *string,
             }
             printf("\nNet prefix: %i\n", (int)(*dstPrefix) );
     )
-}
-
-void printIP(const uint8_t ip[PROTOCOL_ADDRESS_LENGTH]) {
-    for (int i = 0; i < PROTOCOL_ADDRESS_LENGTH; ++i) {
-        printf("%d.", (int)ip[i]);
-    }
 }
 
 int main(int argc, char **argv) {
@@ -84,7 +79,7 @@ int main(int argc, char **argv) {
         setDstIP(netAddr, &packet);
         DEBUG(
             printf("Sending ARP request to IP ");
-            printIP(netAddr);
+            printIP(netAddr, stdout);
             printf(" ..............");
         )
         if(sendto(s, &packet, sizeof(packet), 0,(struct sockaddr*) &addr, sizeof(addr)) == -1) {
@@ -93,6 +88,25 @@ int main(int argc, char **argv) {
             return 1;
         }
         DEBUG(printf("[ DONE ]\n");)
+        // waiting for response
+        usleep(200);
+        struct ArpPacket response;
+        ssize_t receivedResponseSize;
+        if (receivedResponseSize = recv(s, &response, sizeof(response), MSG_DONTWAIT | MSG_TRUNC) > 0) {
+            DEBUG(
+                printf("Received %ld bytes of response: \n", (long) receivedResponseSize);
+                printPacket(&response);
+            )
+            if (memcmp(response.senderLogicAddress, packet.senderLogicAddress, sizeof(packet.senderLogicAddress))) {
+                printf("IP ");
+                printIP(response.senderLogicAddress, stdout);
+                printf(" has MAC: ");
+                for (int j = 0; j < HARDWARE_ADDRESS_LENGTH; ++j) {
+                    printf("%x:", (int)response.senderHardwareAddress[j]);
+                }
+                printf("\n");
+            }
+        }
     }
     return 0;
 }

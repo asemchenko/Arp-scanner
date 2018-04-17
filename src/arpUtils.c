@@ -36,15 +36,13 @@ void prepareArpPacket(struct ArpPacket *dst,
     )
     memset(&dst->targetHardwareAddress, 0xFF, HARDWARE_ADDRESS_LENGTH);\
     if (getInterfaceIP(dst->senderLogicAddress, interfaceName) ) {
-        fprintf(stderr, "Interface %s not found\n", interfaceName);
+        fprintf(stderr, "Can not get IP of interface %s. Check your connection\n", interfaceName);
         exit(1);
     }
     DEBUG(
             fprintf(stderr, "Interface %s has IP: ", interfaceName);
-    for (int j = 0; j < PROTOCOL_ADDRESS_LENGTH; ++j) {
-        fprintf(stderr, "%d:", (int)(dst->senderLogicAddress[j]) );
-    }
-    fprintf(stderr, "\n");
+            printIP(dst->senderLogicAddress, stderr);
+            fprintf(stderr, "\n");
     )
     dst->operation = htons(1);
 }
@@ -162,4 +160,10 @@ void setHostPart(uint8_t ip[PROTOCOL_ADDRESS_LENGTH],
 void setDstIP(uint8_t ip[PROTOCOL_ADDRESS_LENGTH],
               struct ArpPacket *p) {
     memcpy(&p->targetLogicAddress, ip, PROTOCOL_ADDRESS_LENGTH);
+}
+
+void printIP(uint8_t ip[PROTOCOL_ADDRESS_LENGTH], FILE *stream) {
+    for (int j = 0; j < PROTOCOL_ADDRESS_LENGTH; ++j) {
+        fprintf(stream, "%d.", (int)(ip[j]) );
+    }
 }
